@@ -53,7 +53,7 @@
       font-family: 'Montserrat', sans-serif;
       font-weight: 700;
       letter-spacing: -0.025em;
-      line-height: 1.08;
+      line-height: 1.12;
     }
     ::selection { background: rgba(198,165,89,.32); color:#fff; }
 
@@ -315,7 +315,7 @@
     .faq-item.open .faq-icon { transform:rotate(45deg); background:rgba(198,165,89,.15); border-color:rgba(198,165,89,.3); }
     .faq-body { max-height:0; overflow:hidden; transition:max-height .35s ease; }
     .faq-item.open .faq-body { max-height:300px; }
-    .faq-body-inner { padding-bottom:22px; font-size:15px; line-height:1.72; color:rgba(255,255,255,.46); }
+    .faq-body-inner { padding-bottom:22px; font-size:15px; line-height:1.72; color:rgba(255,255,255,.58); }
 
     /* ── Security rows ── */
     .icon-box {
@@ -348,6 +348,68 @@
     @keyframes node-pulse { 0%,100%{transform:scale(1);opacity:.5} 50%{transform:scale(1.6);opacity:0} }
     .hub-spoke { stroke-dasharray:4 6; animation:spoke-dash 2s linear infinite; }
     .hub-pulse { transform-origin:260px 150px; animation:node-pulse 2.2s ease-out infinite; }
+
+    /* ── Responsive grids ── */
+    .g-features { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+    .g-2col     { display:grid; grid-template-columns:1fr 1fr; gap:72px; align-items:start; }
+    .g-2col-c   { display:grid; grid-template-columns:1fr 1fr; gap:72px; align-items:center; }
+    .g-4col     { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+    .g-stats    { display:grid; grid-template-columns:repeat(3,1fr); gap:32px; max-width:600px; margin:0 auto 60px; text-align:center; }
+    .g-footer   { display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr 1fr; gap:40px; margin-bottom:48px; }
+    .g-2x2      { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+    @media (max-width:1023px) {
+      .g-2col, .g-2col-c { grid-template-columns:1fr; gap:48px; }
+      .g-features { grid-template-columns:repeat(2,1fr); }
+      .g-footer   { grid-template-columns:repeat(3,1fr); }
+    }
+    @media (max-width:767px) {
+      .hero-section { padding-top:96px !important; padding-bottom:64px !important; min-height:auto !important; }
+      .g-features { grid-template-columns:1fr; }
+      .g-4col     { grid-template-columns:repeat(2,1fr); }
+      .g-footer   { grid-template-columns:repeat(2,1fr); }
+      .g-stats    { gap:20px; }
+      .sp         { padding:72px 0; }
+      .sp-sm      { padding:48px 0; }
+    }
+    @media (max-width:479px) {
+      .g-footer { grid-template-columns:1fr; }
+      .g-stats  { grid-template-columns:1fr; }
+    }
+
+    /* ── Mobile nav overlay ── */
+    .hamburger {
+      display:none; flex-direction:column; justify-content:center; gap:5.5px;
+      width:36px; height:36px; padding:7px; cursor:pointer;
+      border:1px solid rgba(255,255,255,.1); border-radius:8px; background:transparent;
+      flex-shrink:0; transition:border-color .2s ease;
+    }
+    .hamburger:hover { border-color:rgba(255,255,255,.25); }
+    .hamburger:focus-visible { outline:2px solid var(--gold); outline-offset:2px; }
+    .hamburger span {
+      display:block; width:18px; height:1.5px;
+      background:rgba(255,255,255,.72); border-radius:2px;
+      transition:transform .25s ease, opacity .2s ease;
+    }
+    .hamburger.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity:0; }
+    .hamburger.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
+    #mobile-nav {
+      display:none; position:fixed; top:64px; left:0; right:0; z-index:49;
+      background:rgba(8,8,8,.97); backdrop-filter:blur(28px);
+      -webkit-backdrop-filter:blur(28px);
+      border-bottom:1px solid rgba(255,255,255,.07);
+      padding:8px 24px 24px; flex-direction:column;
+    }
+    #mobile-nav.open { display:flex; }
+    .mob-link {
+      font-family:'DM Sans',sans-serif; font-size:15px; font-weight:500;
+      color:rgba(255,255,255,.6); text-decoration:none;
+      padding:14px 0; border-bottom:1px solid rgba(255,255,255,.05);
+      transition:color .2s;
+    }
+    .mob-link:hover { color:#fff; }
+    @media (max-width:767px) { .hamburger { display:flex; } }
   </style>
 </head>
 <body>
@@ -369,12 +431,27 @@
     <div class="flex items-center gap-2">
       <button class="btn-nav btn-nav-ghost hidden sm:inline-flex">Log In</button>
       <button class="btn-nav btn-nav-primary" style="letter-spacing:.04em;text-transform:uppercase;">Get Started</button>
+      <button class="hamburger" id="hamburger-btn" aria-label="Toggle menu" aria-expanded="false" onclick="toggleMobileNav(this)">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </div>
 </nav>
 
+<div id="mobile-nav" role="navigation" aria-label="Mobile navigation">
+  <a href="#" class="mob-link">Product</a>
+  <a href="#" class="mob-link">Solutions</a>
+  <a href="#" class="mob-link">Pricing</a>
+  <a href="#" class="mob-link">Docs</a>
+  <a href="#" class="mob-link" style="border-bottom:none;">Blog</a>
+  <div style="padding-top:16px;display:flex;flex-direction:column;gap:8px;">
+    <button class="btn-nav btn-nav-ghost" style="width:100%;justify-content:center;">Log In</button>
+    <button class="btn-nav btn-nav-primary" style="width:100%;justify-content:center;letter-spacing:.04em;text-transform:uppercase;">Get Started</button>
+  </div>
+</div>
+
 <!-- ═══════════════════════════ HERO ═══════════════════════════ -->
-<section style="background:var(--dark);padding-top:128px;padding-bottom:96px;position:relative;overflow:hidden;min-height:92vh;display:flex;align-items:center;">
+<section class="hero-section" style="background:var(--dark);padding-top:128px;padding-bottom:96px;position:relative;overflow:hidden;min-height:92vh;display:flex;align-items:center;">
   <div id="hero-bg-paths" style="position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden;"></div>
   <!-- Background glows -->
   <div style="position:absolute;top:-100px;right:-80px;width:640px;height:440px;background:radial-gradient(ellipse,rgba(198,165,89,.16) 0%,transparent 70%);filter:blur(100px);pointer-events:none;"></div>
@@ -389,12 +466,12 @@
           <span class="dot"></span>
           Introducing Tester.io v2.0
         </div>
-        <h1 style="font-size:clamp(2.4rem,5vw,3.9rem);font-weight:900;letter-spacing:-.038em;line-height:1.04;margin-bottom:22px;">
+        <h1 style="font-size:clamp(2.4rem,5vw,3.9rem);font-weight:900;letter-spacing:-.038em;line-height:1.1;margin-bottom:22px;">
           The Simpler, Safer Way<br>
           to <span class="grad-text">Test &amp; Deploy</span><br>
           AI Agents
         </h1>
-        <p style="font-size:17px;line-height:1.72;color:rgba(255,255,255,.48);max-width:470px;margin-bottom:36px;">
+        <p style="font-size:17px;line-height:1.72;color:rgba(255,255,255,.62);max-width:470px;margin-bottom:36px;">
           Tester.io gives your team a unified control plane for validating, monitoring, and shipping production-grade AI — without the infrastructure headache.
         </p>
         <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:40px;">
@@ -575,35 +652,35 @@
       <h2 style="font-size:clamp(1.9rem,3.5vw,2.9rem);font-weight:800;letter-spacing:-.03em;color:#111;margin-bottom:14px;">One platform to test faster, safely.</h2>
       <p style="font-family:'DM Sans',sans-serif;font-size:16px;color:#6b6060;max-width:480px;margin:0 auto;line-height:1.68;">Everything your team needs to validate AI, ship with confidence, and scale without chaos.</p>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;" class="fu d1">
+    <div class="g-features fu d1">
       <div class="light-card">
         <div class="light-icon" style="margin-bottom:20px;"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 10l4 4 10-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <h3 style="font-size:15px;font-weight:700;color:#111;margin-bottom:8px;">Automated Test Suites</h3>
+        <h3 style="font-size:16px;font-weight:700;color:#111;margin-bottom:8px;">Automated Test Suites</h3>
         <p style="font-family:'DM Sans',sans-serif;font-size:14px;color:#6b6060;line-height:1.62;">Run thousands of AI behavior tests in parallel. Catch regressions before they reach production.</p>
       </div>
       <div class="light-card">
         <div class="light-icon" style="margin-bottom:20px;"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="11" y="3" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="11" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="11" y="11" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.8"/></svg></div>
-        <h3 style="font-size:15px;font-weight:700;color:#111;margin-bottom:8px;">Unified Dashboard</h3>
+        <h3 style="font-size:16px;font-weight:700;color:#111;margin-bottom:8px;">Unified Dashboard</h3>
         <p style="font-family:'DM Sans',sans-serif;font-size:14px;color:#6b6060;line-height:1.62;">Monitor every agent, model, and integration from a single pane of glass. No more tab soup.</p>
       </div>
       <div class="light-card">
         <div class="light-icon" style="margin-bottom:20px;"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 3v14M3 10h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
-        <h3 style="font-size:15px;font-weight:700;color:#111;margin-bottom:8px;">Instant Integrations</h3>
+        <h3 style="font-size:16px;font-weight:700;color:#111;margin-bottom:8px;">Instant Integrations</h3>
         <p style="font-family:'DM Sans',sans-serif;font-size:14px;color:#6b6060;line-height:1.62;">Connect your CI/CD, model providers, and data stores in minutes — not weeks.</p>
       </div>
       <div class="light-card">
         <div class="light-icon" style="margin-bottom:20px;"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2a8 8 0 100 16A8 8 0 0010 2z" stroke="currentColor" stroke-width="1.8"/><path d="M10 6v4l3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
-        <h3 style="font-size:15px;font-weight:700;color:#111;margin-bottom:8px;">Real-Time Monitoring</h3>
+        <h3 style="font-size:16px;font-weight:700;color:#111;margin-bottom:8px;">Real-Time Monitoring</h3>
         <p style="font-family:'DM Sans',sans-serif;font-size:14px;color:#6b6060;line-height:1.62;">Live traces, latency metrics, and token usage across every production call — with instant alerts.</p>
       </div>
       <div class="light-card">
         <div class="light-icon" style="margin-bottom:20px;"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 16l4-8 4 6 3-4 3 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <h3 style="font-size:15px;font-weight:700;color:#111;margin-bottom:8px;">Eval Benchmarking</h3>
+        <h3 style="font-size:16px;font-weight:700;color:#111;margin-bottom:8px;">Eval Benchmarking</h3>
         <p style="font-family:'DM Sans',sans-serif;font-size:14px;color:#6b6060;line-height:1.62;">Compare model versions, prompts, and configs side by side with objective scorecards.</p>
       </div>
       <div class="light-card">
         <div class="light-icon" style="margin-bottom:20px;"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M17 9A7 7 0 113 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M10 12V9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
-        <h3 style="font-size:15px;font-weight:700;color:#111;margin-bottom:8px;">Role-Based Access</h3>
+        <h3 style="font-size:16px;font-weight:700;color:#111;margin-bottom:8px;">Role-Based Access</h3>
         <p style="font-family:'DM Sans',sans-serif;font-size:14px;color:#6b6060;line-height:1.62;">Enterprise-grade permissions so the right people see the right data — and no one else does.</p>
       </div>
     </div>
@@ -611,7 +688,7 @@
 </section>
 
 <!-- ═══════════════════════════ BOLD STATEMENT ═══════════════════════════ -->
-<section style="background:var(--dark);padding:100px 0;border-top:1px solid rgba(255,255,255,.04);">
+<section class="sp" style="background:var(--dark);border-top:1px solid rgba(255,255,255,.04);">
   <div class="max-w-4xl mx-auto px-6 text-center fu">
     <h2 style="font-size:clamp(2rem,4.2vw,3.3rem);font-weight:800;letter-spacing:-.03em;line-height:1.18;color:rgba(255,255,255,.88);">
       The tools your teams love are making
@@ -619,7 +696,7 @@
       <span style="color:rgba(255,255,255,.38);">customer-facing apps,</span>
       and <span class="grad-text">critical pipelines</span> — all powered by AI.
     </h2>
-    <p style="margin-top:24px;font-size:17px;color:rgba(255,255,255,.36);max-width:540px;margin-left:auto;margin-right:auto;line-height:1.68;">
+    <p style="margin-top:24px;font-size:17px;color:rgba(255,255,255,.52);max-width:540px;margin-left:auto;margin-right:auto;line-height:1.68;">
       Tester.io keeps every workflow safe, observable, and audit-ready — so your team ships faster without flying blind.
     </p>
   </div>
@@ -633,13 +710,13 @@
         Tester.io is the Command and Control<br>
         Plane for <span class="grad-text">AI Testing</span>
       </h2>
-      <p style="font-size:16px;color:rgba(255,255,255,.4);max-width:460px;margin:0 auto;line-height:1.68;">
+      <p style="font-size:16px;color:rgba(255,255,255,.54);max-width:460px;margin:0 auto;line-height:1.68;">
         One platform to orchestrate every agent, model, and integration across your stack.
       </p>
     </div>
 
     <!-- Stats with count-up -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:32px;max-width:600px;margin:0 auto 60px;text-align:center;" class="fu d1">
+    <div class="g-stats fu d1">
       <div>
         <div class="stat-num" style="font-size:3.1rem;" data-count="18000" data-suffix="+" data-prefix="">0+</div>
         <p style="font-size:12px;color:rgba(255,255,255,.3);margin-top:8px;font-family:'DM Sans',sans-serif;letter-spacing:.02em;">Test runs daily</p>
@@ -695,9 +772,9 @@
 </section>
 
 <!-- ═══════════════════════════ ENABLE ANY AGENT ═══════════════════════════ -->
-<section class="s-light" style="padding:100px 0;">
+<section class="s-light sp">
   <div class="max-w-7xl mx-auto px-6">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;" class="fu">
+    <div class="g-2col-c fu">
       <div>
         <span style="font-family:'DM Sans',sans-serif;font-size:11px;color:rgba(139,111,53,.9);letter-spacing:.12em;text-transform:uppercase;display:block;margin-bottom:14px;">Flexible by design</span>
         <h2 style="font-size:clamp(1.8rem,3vw,2.55rem);font-weight:800;letter-spacing:-.03em;margin-bottom:18px;color:#111;">
@@ -812,9 +889,9 @@
 </section>
 
 <!-- ═══════════════════════════ SECURITY ═══════════════════════════ -->
-<section class="s-light" style="padding:100px 0;border-top:1px solid rgba(0,0,0,.06);">
+<section class="s-light sp" style="border-top:1px solid rgba(0,0,0,.06);">
   <div class="max-w-7xl mx-auto px-6">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:start;" class="fu">
+    <div class="g-2col fu">
       <div>
         <span style="font-family:'DM Sans',sans-serif;font-size:11px;color:rgba(139,111,53,.9);letter-spacing:.12em;text-transform:uppercase;display:block;margin-bottom:14px;">Enterprise ready</span>
         <h2 style="font-size:clamp(1.8rem,3vw,2.55rem);font-weight:800;letter-spacing:-.03em;margin-bottom:16px;line-height:1.1;color:#111;">
@@ -845,7 +922,7 @@
       <div class="fu d2">
         <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:20px;padding:28px;box-shadow:0 6px 40px rgba(0,0,0,.08);">
           <p style="font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;color:#bbb;letter-spacing:.1em;text-transform:uppercase;margin-bottom:18px;">Certifications &amp; Compliance</p>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="g-2x2">
             <div style="background:#f7f2ea;border:1px solid rgba(0,0,0,.07);border-radius:12px;padding:18px;text-align:center;">
               <p style="font-family:'Montserrat',sans-serif;font-size:14px;font-weight:800;color:#8b6f35;margin:0 0 3px;letter-spacing:-.01em;">SOC 2</p>
               <p style="font-family:'DM Sans',sans-serif;font-size:11px;color:#999;margin:0;">Type II</p>
@@ -878,7 +955,7 @@
 </section>
 
 <!-- ═══════════════════════════ INTEGRATIONS ═══════════════════════════ -->
-<section class="s-light" style="padding:100px 0;border-top:1px solid rgba(0,0,0,.06);">
+<section class="s-light sp" style="border-top:1px solid rgba(0,0,0,.06);">
   <div class="max-w-7xl mx-auto px-6">
     <div class="text-center fu" style="margin-bottom:52px;">
       <h2 style="font-size:clamp(1.8rem,3vw,2.55rem);font-weight:800;letter-spacing:-.03em;margin-bottom:10px;color:#111;">
@@ -886,7 +963,7 @@
       </h2>
       <p style="font-size:16px;color:#6b6060;max-width:420px;margin:0 auto;line-height:1.62;">Connect the tools you already use — no custom code required.</p>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;" class="fu d1">
+    <div class="g-4col fu d1">
       <div class="int-light"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#8b6f35" stroke-width="1.3"/></svg>GitHub</div>
       <div class="int-light"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="#8b6f35" stroke-width="1.3"/></svg>GitLab</div>
       <div class="int-light"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 13V3l5 4 5-4v10" stroke="#8b6f35" stroke-width="1.3" stroke-linecap="round"/></svg>Slack</div>
@@ -904,9 +981,9 @@
 </section>
 
 <!-- ═══════════════════════════ ONE PLATFORM CTA ═══════════════════════════ -->
-<section class="s-light" style="padding:100px 0;border-top:1px solid rgba(0,0,0,.06);">
+<section class="s-light sp" style="border-top:1px solid rgba(0,0,0,.06);">
   <div class="max-w-7xl mx-auto px-6">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;" class="fu">
+    <div class="g-2col-c fu">
       <div>
         <h2 style="font-size:clamp(1.8rem,3vw,2.55rem);font-weight:800;letter-spacing:-.03em;margin-bottom:18px;line-height:1.1;color:#111;">
           One Platform to<br><span style="background:linear-gradient(135deg,#8b6f35,#c6a559,#8b6f35);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Power Every Agent</span>
@@ -919,7 +996,7 @@
           <button style="display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:10px;background:transparent;color:#333;font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px;letter-spacing:.04em;text-transform:uppercase;border:1px solid rgba(0,0,0,.15);cursor:pointer;transition:all .2s ease;" onmouseover="this.style.background='rgba(0,0,0,.05)';this.style.borderColor='rgba(0,0,0,.28)'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(0,0,0,.15)'">Talk to sales</button>
         </div>
       </div>
-      <div class="fu d2" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="fu d2 g-2x2">
         <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:14px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.05);transition:transform .25s ease,box-shadow .25s ease;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,.1)'" onmouseout="this.style.transform='none';this.style.boxShadow='0 2px 8px rgba(0,0,0,.05)'">
           <p style="font-family:'Montserrat',sans-serif;font-size:24px;font-weight:900;color:#8b6f35;margin:0 0 4px;letter-spacing:-.03em;">500+</p>
           <p style="font-family:'DM Sans',sans-serif;font-size:12px;color:#888;margin:0;">Test templates</p>
@@ -1002,7 +1079,7 @@
     <h2 style="font-size:clamp(2.6rem,5.5vw,4.4rem);font-weight:900;letter-spacing:-.045em;line-height:1.03;margin-bottom:22px;">
       Agents and Work.<br><span class="grad-text">Connected.</span>
     </h2>
-    <p style="font-size:17px;color:rgba(255,255,255,.36);max-width:420px;margin:0 auto 40px;line-height:1.68;">
+    <p style="font-size:17px;color:rgba(255,255,255,.52);max-width:420px;margin:0 auto 40px;line-height:1.68;">
       Join thousands of teams using Tester.io to ship better AI, faster — with the observability and safety your enterprise demands.
     </p>
     <div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:18px;">
@@ -1016,7 +1093,7 @@
 <!-- ═══════════════════════════ FOOTER ═══════════════════════════ -->
 <footer style="background:#060606;border-top:1px solid rgba(255,255,255,.05);">
   <div class="max-w-7xl mx-auto px-6 py-16">
-    <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px;">
+    <div class="g-footer">
       <div>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
           <img src="brand_assets/tester-logo.png" alt="" style="height:28px;width:auto;">
@@ -1055,6 +1132,24 @@
 </footer>
 
 <script>
+  // Mobile nav toggle
+  function toggleMobileNav(btn) {
+    const nav = document.getElementById('mobile-nav');
+    const isOpen = nav.classList.toggle('open');
+    btn.classList.toggle('open', isOpen);
+    btn.setAttribute('aria-expanded', isOpen);
+  }
+  // Close mobile nav on outside click
+  document.addEventListener('click', (e) => {
+    const nav = document.getElementById('mobile-nav');
+    const btn = document.getElementById('hamburger-btn');
+    if (nav.classList.contains('open') && !nav.contains(e.target) && !btn.contains(e.target)) {
+      nav.classList.remove('open');
+      btn.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  });
+
   // FAQ accordion
   function toggleFaq(btn) {
     const item = btn.closest('.faq-item');
