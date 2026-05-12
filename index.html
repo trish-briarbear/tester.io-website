@@ -365,6 +365,10 @@
     }
     @media (max-width:767px) {
       .hero-section { padding-top:96px !important; padding-bottom:64px !important; min-height:auto !important; }
+      /* Hero dashboard: stack metrics row above card instead of floating */
+      .hero-dash-col { flex-direction:column !important; align-items:stretch !important; justify-content:flex-start !important; min-height:auto !important; gap:10px; }
+      .hero-metrics-row { display:flex !important; gap:10px; }
+      .hero-metrics-row .metric-bubble { position:static !important; flex:1; min-width:0; animation:none !important; }
       .g-features { grid-template-columns:1fr; }
       .g-4col     { grid-template-columns:repeat(2,1fr); }
       .g-footer   { grid-template-columns:repeat(2,1fr); gap:36px 24px; }
@@ -492,20 +496,23 @@
       </div>
 
       <!-- Hero product mockup -->
-      <div class="fu d2" style="position:relative;min-height:460px;display:flex;align-items:center;justify-content:center;">
+      <div class="fu d2 hero-dash-col" style="position:relative;min-height:460px;display:flex;align-items:center;justify-content:center;">
         <!-- Ambient glow -->
         <div style="position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(198,165,89,.12) 0%,transparent 65%);pointer-events:none;"></div>
 
-        <!-- Floating bubble: tests -->
-        <div class="metric-bubble" style="top:10px;left:0;animation:float-a 4.2s ease-in-out infinite;">
-          <div style="font-size:10px;color:rgba(255,255,255,.38);margin-bottom:3px;letter-spacing:.06em;text-transform:uppercase;">Completed</div>
-          <div style="font-family:'Montserrat',sans-serif;font-size:17px;font-weight:800;color:#22c55e;letter-spacing:-.02em;">247 <span style="font-size:12px;font-weight:500;color:rgba(255,255,255,.36);">tests ✓</span></div>
-        </div>
+        <!-- Metric bubbles: float on desktop, inline row on mobile -->
+        <div class="hero-metrics-row">
+          <!-- Floating bubble: tests -->
+          <div class="metric-bubble" style="top:10px;left:0;animation:float-a 4.2s ease-in-out infinite;">
+            <div style="font-size:10px;color:rgba(255,255,255,.38);margin-bottom:3px;letter-spacing:.06em;text-transform:uppercase;">Completed</div>
+            <div style="font-family:'Montserrat',sans-serif;font-size:17px;font-weight:800;color:#22c55e;letter-spacing:-.02em;">247 <span style="font-size:12px;font-weight:500;color:rgba(255,255,255,.36);">tests ✓</span></div>
+          </div>
 
-        <!-- Floating bubble: latency -->
-        <div class="metric-bubble" style="bottom:48px;right:-8px;animation:float-b 3.6s ease-in-out infinite .4s;">
-          <div style="font-size:10px;color:rgba(255,255,255,.38);margin-bottom:3px;letter-spacing:.06em;text-transform:uppercase;">Avg Latency</div>
-          <div style="font-family:'Montserrat',sans-serif;font-size:17px;font-weight:800;color:var(--gold);letter-spacing:-.02em;">142<span style="font-size:12px;font-weight:500;color:rgba(255,255,255,.36);">ms</span></div>
+          <!-- Floating bubble: latency -->
+          <div class="metric-bubble" style="bottom:48px;right:-8px;animation:float-b 3.6s ease-in-out infinite .4s;">
+            <div style="font-size:10px;color:rgba(255,255,255,.38);margin-bottom:3px;letter-spacing:.06em;text-transform:uppercase;">Avg Latency</div>
+            <div style="font-family:'Montserrat',sans-serif;font-size:17px;font-weight:800;color:var(--gold);letter-spacing:-.02em;">142<span style="font-size:12px;font-weight:500;color:rgba(255,255,255,.36);">ms</span></div>
+          </div>
         </div>
 
         <!-- Dashboard card -->
