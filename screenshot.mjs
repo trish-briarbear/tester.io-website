@@ -1,4 +1,4 @@
-import puppeteer from 'file:///C:/Users/PC/AppData/Local/Temp/puppeteer-test/node_modules/puppeteer/lib/cjs/puppeteer/puppeteer.js';
+import puppeteer from './node_modules/puppeteer/lib/esm/puppeteer/puppeteer.js';
 import fs from 'fs';
 import path from 'path';
 
