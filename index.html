@@ -367,13 +367,14 @@
       .hero-section { padding-top:96px !important; padding-bottom:64px !important; min-height:auto !important; }
       .g-features { grid-template-columns:1fr; }
       .g-4col     { grid-template-columns:repeat(2,1fr); }
-      .g-footer   { grid-template-columns:repeat(2,1fr); }
+      .g-footer   { grid-template-columns:repeat(2,1fr); gap:36px 24px; }
+      .g-footer > div:first-child { grid-column:1 / -1; padding-bottom:20px; border-bottom:1px solid rgba(255,255,255,.07); margin-bottom:4px; }
       .g-stats    { gap:20px; }
       .sp         { padding:72px 0; }
       .sp-sm      { padding:48px 0; }
     }
     @media (max-width:479px) {
-      .g-footer { grid-template-columns:1fr; }
+      .g-footer { grid-template-columns:1fr 1fr; gap:24px 16px; }
       .g-stats  { grid-template-columns:1fr; }
     }
 
