@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tester Smart Watch Pro — Dissected</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: auto; }
+
+    :root {
+      --bg:         #050505;
+      --surface:    #0d0d0d;
+      --gold:       #c6a559;
+      --gold-light: #e6b979;
+      --text:       #f0ede8;
+      --muted:      rgba(240,237,232,0.46);
+      --display:    'Bebas Neue', sans-serif;
+      --body:       'DM Sans', sans-serif;
+      --mono:       'DM Mono', monospace;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--body);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* grain */
+    body::after {
+      content: ''; position: fixed; inset: 0;
+      z-index: 9000; pointer-events: none; opacity: 0.028;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 128px 128px;
+    }
+
+    /* ── LOADER ── */
+    #loader {
+      position: fixed; inset: 0; z-index: 9999;
+      background: var(--bg);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
+      transition: opacity 0.6s ease, visibility 0.6s ease;
+    }
+    #loader.out { opacity: 0; visibility: hidden; }
+    .ld-logo { display: flex; align-items: center; gap: 10px; }
+    .ld-logo img { height: 28px; }
+    .ld-brand { font-family: var(--display); font-size: 26px; letter-spacing: 0.1em; color: var(--text); }
+    .ld-brand em { font-style: normal; color: var(--gold); }
+    #ld-bar { width: 180px; height: 1px; background: rgba(255,255,255,0.1); border-radius: 1px; overflow: hidden; }
+    #ld-fill { height: 100%; width: 0%; background: linear-gradient(90deg,var(--gold),var(--gold-light)); transition: width 0.1s linear; }
+    #ld-pct { font-family: var(--mono); font-size: 10px; color: rgba(240,237,232,0.35); letter-spacing: 0.12em; }
+
+    /* ── HEADER ── */
+    #site-header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+      padding: 0 36px; height: 62px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid transparent;
+      transition: background 0.4s, border-color 0.4s;
+    }
+    #site-header.scrolled {
+      background: rgba(5,5,5,0.9); backdrop-filter: blur(20px);
+      border-color: rgba(255,255,255,0.06);
+    }
+    .hdr-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+    .hdr-logo img { height: 24px; }
+    .hdr-logotxt { font-family: 'DM Sans',sans-serif; font-weight: 800; font-size: 14px; letter-spacing: -0.02em; color: #fff; }
+    .hdr-logotxt em { font-style: normal; background: linear-gradient(135deg,#c6a559,#e6b979); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hdr-nav { display: flex; align-items: center; gap: 28px; }
+    .hdr-nav a { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.5); text-decoration: none; transition: color 0.2s; }
+    .hdr-nav a:hover { color: #fff; }
+    .hdr-cta {
+      display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: 8px;
+      background: linear-gradient(135deg,#c6a559,#e6b979); color: #050505;
+      font-weight: 700; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase;
+      text-decoration: none; box-shadow: 0 0 18px rgba(198,165,89,0.22);
+      transition: transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.2s;
+    }
+    .hdr-cta:hover { transform: translateY(-1px); box-shadow: 0 0 32px rgba(198,165,89,0.42); }
+
+    /* ── HERO ── */
+    #hero {
+      position: relative; min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; overflow: hidden;
+    }
+    #hero-vid-bg {
+      position: absolute; inset: 0; z-index: 0; overflow: hidden;
+    }
+    #hero-canvas {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+    }
+    #hero-vid-bg::after {
+      content: ''; position: absolute; inset: 0;
+      background:
+        linear-gradient(to bottom, rgba(5,5,5,0.68) 0%, rgba(5,5,5,0.42) 50%, rgba(5,5,5,0.72) 100%);
+    }
+
+    .hero-inner {
+      position: relative; z-index: 1;
+      padding: 120px 24px 80px;
+      display: flex; flex-direction: column; align-items: center;
+      width: 100%;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 24px;
+      opacity: 0; transform: translateY(10px);
+    }
+    .hero-eyebrow .pulse {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--gold); box-shadow: 0 0 8px var(--gold);
+      animation: pdot 2s ease-in-out infinite;
+    }
+    @keyframes pdot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.45;transform:scale(0.75)} }
+
+    .hero-heading {
+      font-family: var(--display);
+      font-size: clamp(5rem, 13vw, 13rem);
+      line-height: 0.88; letter-spacing: 0.015em;
+      color: #fff; display: flex; flex-direction: column; align-items: center;
+      margin-bottom: 20px;
+    }
+    .hw  { display: block; overflow: hidden; }
+    .hwi { display: block; transform: translateY(110%); }
+    .hw.gold .hwi {
+      background: linear-gradient(135deg,#c6a559 0%,#e6b979 50%,#c6a559 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    .hero-tag {
+      font-size: 13px; font-weight: 300;
+      color: rgba(240,237,232,0.5); letter-spacing: 0.18em; text-transform: uppercase;
+      opacity: 0; margin-bottom: 48px;
+    }
+
+    .scroll-ind {
+      display: flex; flex-direction: column; align-items: center; gap: 10px; opacity: 0;
+    }
+    .scroll-ind span { font-family: var(--mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.25); }
+    .scroll-arr {
+      width: 18px; height: 18px;
+      border-right: 1px solid rgba(255,255,255,0.22); border-bottom: 1px solid rgba(255,255,255,0.22);
+      transform: rotate(45deg); animation: sarr 2s ease-in-out infinite;
+    }
+    @keyframes sarr { 0%,100%{transform:rotate(45deg) translateY(0)} 50%{transform:rotate(45deg) translateY(5px)} }
+
+    /* ── MARQUEE DIVIDER ── */
+    .marquee-section {
+      overflow: hidden; padding: 28px 0;
+      border-top: 1px solid rgba(255,255,255,0.04);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      background: var(--surface);
+      mask-image: linear-gradient(90deg,transparent,black 10%,black 90%,transparent);
+      -webkit-mask-image: linear-gradient(90deg,transparent,black 10%,black 90%,transparent);
+    }
+    .mq-track {
+      display: flex; align-items: center; width: max-content;
+      animation: mqscroll 28s linear infinite;
+    }
+    @keyframes mqscroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+    .mq-item { font-family: var(--display); font-size: 11vw; color: rgba(255,255,255,0.045); white-space: nowrap; letter-spacing: 0.02em; line-height: 1; padding: 0 3vw; user-select: none; }
+    .mq-dot  { color: rgba(198,165,89,0.2); font-size: 8vw; line-height: 1; padding: 0 1vw; }
+
+    /* ── FEATURES (scroll-driven canvas scrub) ── */
+    #features-bg { position: relative; background: var(--bg); }
+
+    #feat-vid-bg {
+      position: sticky; top: 0; height: 100vh; overflow: hidden; z-index: 0;
+    }
+    #scrub-canvas {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    #feat-vid-bg::after {
+      content: ''; position: absolute; inset: 0;
+      background: rgba(5,5,5,0.5);
+    }
+
+    #dark-overlay { position: fixed; inset: 0; z-index: 3; background: #050505; opacity: 0; pointer-events: none; }
+
+    #scroll-container { position: relative; z-index: 10; height: 800vh; margin-top: -100vh; }
+
+    /* ── SCROLL SECTIONS ── */
+    .ss { position: absolute; width: 100%; opacity: 0; pointer-events: none; transform: translateY(-50%); z-index: 50; }
+    .ss.active { pointer-events: auto; }
+
+    .sec-label { display: block; font-family: var(--mono); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; }
+    .sec-head {
+      font-family: var(--display); font-size: clamp(4rem,7.5vw,8rem);
+      line-height: 0.91; color: #fff; margin-bottom: 22px;
+      text-shadow: 0 4px 40px rgba(0,0,0,0.8), 0 0 80px rgba(0,0,0,0.6);
+    }
+    .sec-body { font-size: 15px; font-weight: 400; color: rgba(240,237,232,0.72); line-height: 1.72; max-width: 360px; text-shadow: 0 2px 16px rgba(0,0,0,0.9); }
+    .sec-note { margin-top: 14px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; color: var(--gold); text-transform: uppercase; }
+
+    .align-left  { padding-left: 10vw; padding-right: 50vw; }
+    .align-right { padding-left: 50vw; padding-right: 10vw; }
+    .align-left  .si { max-width: 40vw; }
+    .align-right .si { max-width: 40vw; text-align: right; }
+    .align-right .sec-body { margin-left: auto; }
+
+    /* stats */
+    .sec-stats { display: flex; align-items: center; justify-content: center; padding: 48px 40px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 40px; max-width: 860px; width: 100%; text-align: center; }
+    .stat-num { display: block; font-family: var(--display); font-size: clamp(3.5rem,5.5vw,5.5rem); color: #fff; line-height: 1; }
+    .stat-sfx { font-family: var(--display); font-size: clamp(1.4rem,2.2vw,2.2rem); color: var(--gold); }
+    .stat-lbl { display: block; margin-top: 9px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(240,237,232,0.38); }
+
+    /* CTA */
+    .sec-cta { display: flex; align-items: center; justify-content: center; text-align: center; padding: 60px 40px; }
+    .cta-inner { max-width: 560px; }
+    .cta-head { font-family: var(--display); font-size: clamp(4rem,9vw,9.5rem); line-height: 0.88; color: #fff; margin: 14px 0 22px; }
+    .cta-head .g { background: linear-gradient(135deg,#c6a559 0%,#e6b979 50%,#c6a559 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .cta-sub { font-size: 15px; color: var(--muted); line-height: 1.66; margin-bottom: 36px; }
+    .cta-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 17px 38px; border-radius: 12px;
+      background: linear-gradient(135deg,#c6a559 0%,#e6b979 60%,#c6a559 100%);
+      color: #050505; font-family: var(--body); font-weight: 700;
+      font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase;
+      text-decoration: none; border: none; cursor: pointer;
+      box-shadow: 0 0 48px rgba(198,165,89,0.32), 0 8px 32px rgba(0,0,0,0.5);
+      transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), box-shadow 0.25s;
+    }
+    .cta-btn:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 0 72px rgba(198,165,89,0.52), 0 16px 48px rgba(0,0,0,0.6); }
+    .cta-ghost { display: block; margin-top: 16px; font-size: 12px; letter-spacing: 0.1em; color: rgba(240,237,232,0.35); text-decoration: none; transition: color 0.2s; }
+    .cta-ghost:hover { color: rgba(240,237,232,0.7); }
+
+    /* ── FOOTER ── */
+    footer { position: relative; z-index: 60; background: var(--bg); border-top: 1px solid rgba(255,255,255,0.05); padding: 44px 40px 32px; }
+    .ft-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
+    .ft-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+    .ft-logo img { height: 22px; }
+    .ft-logotxt { font-family: 'DM Sans',sans-serif; font-weight: 800; font-size: 14px; color: #fff; }
+    .ft-logotxt em { font-style: normal; background: linear-gradient(135deg,#c6a559,#e6b979); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .ft-links { display: flex; gap: 22px; }
+    .ft-links a { font-size: 13px; color: rgba(255,255,255,0.28); text-decoration: none; transition: color 0.2s; }
+    .ft-links a:hover { color: rgba(255,255,255,0.65); }
+    .ft-copy { font-family: var(--mono); font-size: 11px; color: rgba(255,255,255,0.15); }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      .hdr-nav { display: none; }
+      .align-left, .align-right { padding-left: 24px; padding-right: 24px; }
+      .align-left .si, .align-right .si { max-width: 100%; }
+      .stats-grid { grid-template-columns: repeat(2,1fr); gap: 28px; }
+      #scroll-container { height: 550vh; }
+      .ft-inner { flex-direction: column; align-items: flex-start; }
+      .mq-item { font-size: 16vw; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="ld-logo">
+    <img src="brand_assets/tester-logo.png" alt="">
+    <span class="ld-brand">TESTER<em>.IO</em></span>
+  </div>
+  <div id="ld-bar"><div id="ld-fill"></div></div>
+  <span id="ld-pct">0%</span>
+</div>
+
+<!-- HEADER -->
+<header id="site-header">
+  <a href="index.html" class="hdr-logo">
+    <img src="brand_assets/tester-logo.png" alt="Tester.io">
+    <span class="hdr-logotxt">Tester<em>.io</em></span>
+  </a>
+  <nav class="hdr-nav">
+    <a href="index.html#features">Features</a>
+    <a href="index.html#product">Product</a>
+    <a href="index.html#pricing">Pricing</a>
+    <a href="index.html">Platform</a>
+  </nav>
+  <a href="index.html" class="hdr-cta">Get Started</a>
+</header>
+
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<section id="hero">
+  <div id="hero-vid-bg">
+    <canvas id="hero-canvas"></canvas>
+  </div>
+  <div class="hero-inner">
+    <div class="hero-eyebrow">
+      <div class="pulse"></div>
+      Tester Smart Watch
+    </div>
+    <h1 class="hero-heading" aria-label="Smart Watch Pro">
+      <span class="hw"><span class="hwi">SMART</span></span>
+      <span class="hw"><span class="hwi">WATCH</span></span>
+      <span class="hw gold"><span class="hwi">PRO</span></span>
+    </h1>
+    <p class="hero-tag">Dissected &nbsp;·&nbsp; Decoded &nbsp;·&nbsp; Reimagined</p>
+    <div class="scroll-ind">
+      <span>Scroll to explore</span>
+      <div class="scroll-arr"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ MARQUEE ═══════════════════ -->
+<div class="marquee-section">
+  <div class="mq-track">
+    <span class="mq-item">PRECISION CRAFTED</span><span class="mq-dot">·</span>
+    <span class="mq-item">SENSOR FUSION</span><span class="mq-dot">·</span>
+    <span class="mq-item">ENGINEERED TO LAST</span><span class="mq-dot">·</span>
+    <span class="mq-item">INTELLIGENT BY DESIGN</span><span class="mq-dot">·</span>
+    <span class="mq-item">PRECISION CRAFTED</span><span class="mq-dot">·</span>
+    <span class="mq-item">SENSOR FUSION</span><span class="mq-dot">·</span>
+    <span class="mq-item">ENGINEERED TO LAST</span><span class="mq-dot">·</span>
+    <span class="mq-item">INTELLIGENT BY DESIGN</span><span class="mq-dot">·</span>
+  </div>
+</div>
+
+<!-- ═══════════════════ FEATURES ═══════════════════ -->
+<div id="features-bg">
+  <div id="feat-vid-bg">
+    <canvas id="scrub-canvas" width="1280" height="720"></canvas>
+  </div>
+  <div id="dark-overlay"></div>
+  <div id="scroll-container">
+
+    <!-- 001 / Craftsmanship — slide-left -->
+    <section class="ss align-left" data-enter="3" data-leave="20" data-anim="slide-left">
+      <div class="si">
+        <span class="sec-label">001 / Craftsmanship</span>
+        <h2 class="sec-head">Precision<br>Machined.</h2>
+        <p class="sec-body">Zero compromise in every component. Aerospace-grade titanium housing, sapphire crystal glass — built to outlast and outperform.</p>
+      </div>
+    </section>
+
+    <!-- 002 / Biometrics — slide-right -->
+    <section class="ss align-right" data-enter="14" data-leave="28" data-anim="slide-right">
+      <div class="si">
+        <span class="sec-label">002 / Biometrics</span>
+        <h2 class="sec-head">Your Body.<br>Decoded.</h2>
+        <p class="sec-body">47 bio-sensors in concert. Heart rate, SpO₂, ECG, skin temperature — processed at 0.3ms latency with 99.4% clinical accuracy.</p>
+      </div>
+    </section>
+
+    <!-- 003 / Intelligence — scale-up -->
+    <section class="ss align-left" data-enter="25" data-leave="39" data-anim="scale-up">
+      <div class="si">
+        <span class="sec-label">003 / Intelligence</span>
+        <h2 class="sec-head">AI That<br>Thinks<br>Ahead.</h2>
+        <p class="sec-body">On-device neural processing adapts to you — not just tracking patterns, but anticipating needs before you know to ask.</p>
+        <p class="sec-note">Powered by the Arca Neural Engine</p>
+      </div>
+    </section>
+
+    <!-- STATS — stagger-up, dark overlay -->
+    <section class="ss sec-stats" data-enter="37" data-leave="51" data-anim="stagger-up">
+      <div class="stats-grid">
+        <div class="stat">
+          <span class="stat-num" data-val="180" data-dec="0">0</span><span class="stat-sfx">h</span>
+          <span class="stat-lbl">Battery Life</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num" data-val="47" data-dec="0">0</span><span class="stat-sfx">+</span>
+          <span class="stat-lbl">Bio-Sensors</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num" data-val="0.3" data-dec="1">0</span><span class="stat-sfx">ms</span>
+          <span class="stat-lbl">Response Time</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num" data-val="99.4" data-dec="1">0</span><span class="stat-sfx">%</span>
+          <span class="stat-lbl">Accuracy</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 004 / Inside Out — rotate-in -->
+    <section class="ss align-right" data-enter="48" data-leave="62" data-anim="rotate-in">
+      <div class="si">
+        <span class="sec-label">004 / Inside Out</span>
+        <h2 class="sec-head">Every<br>Layer.</h2>
+        <p class="sec-body">From photoplethysmography sensors to OTA firmware signing — every decision, every material, dissected and explained.</p>
+      </div>
+    </section>
+
+    <!-- CTA — clip-reveal, persist -->
+    <section class="ss sec-cta" data-enter="60" data-leave="90" data-anim="clip-reveal" data-persist="true">
+      <div class="cta-inner">
+        <span class="sec-label">Order / Now</span>
+        <h2 class="cta-head">Ready to<br><span class="g">Go Deeper?</span></h2>
+        <p class="cta-sub">Explore the full dissection library and start testing your own wearable AI systems with Tester.io.</p>
+        <a href="index.html" class="cta-btn">
+          Get Started Free
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M3 7.5h9M9 4l3.5 3.5L9 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="index.html#products" class="cta-ghost">Browse all videos →</a>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-inner">
+    <a href="index.html" class="ft-logo">
+      <img src="brand_assets/tester-logo.png" alt="">
+      <span class="ft-logotxt">Tester<em>.io</em></span>
+    </a>
+    <div class="ft-links">
+      <a href="#">Twitter</a>
+      <a href="#">LinkedIn</a>
+      <a href="#">GitHub</a>
+      <a href="#">Discord</a>
+    </div>
+    <p class="ft-copy">© 2026 Tester.io, Inc.</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/lenis@1/dist/lenis.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+<script src="product/app.js"></script>
+</body>
+</html>
