@@ -188,7 +188,7 @@
 
     #dark-overlay { position: fixed; inset: 0; z-index: 3; background: #050505; opacity: 0; pointer-events: none; }
 
-    #scroll-container { position: relative; z-index: 10; height: 800vh; margin-top: -100vh; }
+    #scroll-container { position: relative; z-index: 10; height: 550vh; margin-top: -100vh; }
 
     /* ── SCROLL SECTIONS ── */
     .ss { position: absolute; width: 100%; opacity: 0; pointer-events: none; transform: translateY(-50%); z-index: 50; }
@@ -254,7 +254,7 @@
       .align-left, .align-right { padding-left: 24px; padding-right: 24px; }
       .align-left .si, .align-right .si { max-width: 100%; }
       .stats-grid { grid-template-columns: repeat(2,1fr); gap: 28px; }
-      #scroll-container { height: 550vh; }
+      #scroll-container { height: 380vh; }
       .ft-inner { flex-direction: column; align-items: flex-start; }
       .mq-item { font-size: 16vw; }
     }
@@ -333,7 +333,7 @@
   <div id="scroll-container">
 
     <!-- 001 / Craftsmanship — slide-left -->
-    <section class="ss align-left" data-enter="3" data-leave="20" data-anim="slide-left">
+    <section class="ss align-left" data-enter="2" data-leave="16" data-anim="slide-left">
       <div class="si">
         <span class="sec-label">001 / Craftsmanship</span>
         <h2 class="sec-head">Precision<br>Machined.</h2>
@@ -342,7 +342,7 @@
     </section>
 
     <!-- 002 / Biometrics — slide-right -->
-    <section class="ss align-right" data-enter="14" data-leave="28" data-anim="slide-right">
+    <section class="ss align-right" data-enter="16" data-leave="30" data-anim="slide-right">
       <div class="si">
         <span class="sec-label">002 / Biometrics</span>
         <h2 class="sec-head">Your Body.<br>Decoded.</h2>
@@ -351,7 +351,7 @@
     </section>
 
     <!-- 003 / Intelligence — scale-up -->
-    <section class="ss align-left" data-enter="25" data-leave="39" data-anim="scale-up">
+    <section class="ss align-left" data-enter="30" data-leave="44" data-anim="scale-up">
       <div class="si">
         <span class="sec-label">003 / Intelligence</span>
         <h2 class="sec-head">AI That<br>Thinks<br>Ahead.</h2>
@@ -361,7 +361,7 @@
     </section>
 
     <!-- STATS — stagger-up, dark overlay -->
-    <section class="ss sec-stats" data-enter="37" data-leave="51" data-anim="stagger-up">
+    <section class="ss sec-stats" data-enter="44" data-leave="58" data-anim="stagger-up">
       <div class="stats-grid">
         <div class="stat">
           <span class="stat-num" data-val="180" data-dec="0">0</span><span class="stat-sfx">h</span>
@@ -382,8 +382,8 @@
       </div>
     </section>
 
-    <!-- 004 / Inside Out — rotate-in -->
-    <section class="ss align-right" data-enter="48" data-leave="62" data-anim="rotate-in">
+    <!-- 004 / Inside Out — slide-right -->
+    <section class="ss align-right" data-enter="58" data-leave="72" data-anim="slide-right">
       <div class="si">
         <span class="sec-label">004 / Inside Out</span>
         <h2 class="sec-head">Every<br>Layer.</h2>
@@ -392,7 +392,7 @@
     </section>
 
     <!-- CTA — clip-reveal, persist -->
-    <section class="ss sec-cta" data-enter="60" data-leave="90" data-anim="clip-reveal" data-persist="true">
+    <section class="ss sec-cta" data-enter="72" data-leave="96" data-anim="clip-reveal" data-persist="true">
       <div class="cta-inner">
         <span class="sec-label">Order / Now</span>
         <h2 class="cta-head">Ready to<br><span class="g">Go Deeper?</span></h2>

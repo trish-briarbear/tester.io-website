@@ -182,7 +182,7 @@
       scrub: true,
       onUpdate(self) {
         const p = self.progress;
-        const sE = 0.37, sL = 0.51, fr = 0.03;
+        const sE = 0.44, sL = 0.58, fr = 0.03;
         let ov = 0;
         if      (p >= sE - fr && p < sE)       ov = (p - (sE - fr)) / fr;
         else if (p >= sE && p < sL)             ov = 0.9;
