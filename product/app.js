@@ -122,12 +122,6 @@
       .to('.hero-tag',   { opacity: 1, duration: 0.8, ease: 'power2.out' }, '-=0.5')
       .to('.scroll-ind', { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.3');
 
-    /* ── Header on scroll ──────────────────────────────────────────────── */
-    ScrollTrigger.create({
-      start: '80px top',
-      onEnter:     () => document.getElementById('site-header').classList.add('scrolled'),
-      onLeaveBack: () => document.getElementById('site-header').classList.remove('scrolled'),
-    });
 
     /* ── Canvas resize handler ──────────────────────────────────────────── */
     function resizeCanvas() {
@@ -182,7 +176,7 @@
       scrub: true,
       onUpdate(self) {
         const p = self.progress;
-        const sE = 0.44, sL = 0.58, fr = 0.03;
+        const sE = 0.54, sL = 0.68, fr = 0.03;
         let ov = 0;
         if      (p >= sE - fr && p < sE)       ov = (p - (sE - fr)) / fr;
         else if (p >= sE && p < sL)             ov = 0.9;
@@ -195,11 +189,16 @@
     document.querySelectorAll('.ss').forEach((sec) => {
       const eP     = parseFloat(sec.dataset.enter) / 100;
       const lP     = parseFloat(sec.dataset.leave) / 100;
-      const mid    = (eP + lP) / 2;
       const persist = sec.dataset.persist === 'true';
       const anim   = sec.dataset.anim;
 
-      sec.style.top = (mid * 100) + '%';
+      // Position each section so it appears at ~85% down the viewport when it
+      // enters — consistent across screen sizes (fixes mobile where early sections
+      // used to appear near the top of the screen, making them easy to miss).
+      const H_cont   = scrollCont.offsetHeight;
+      const H_view   = window.innerHeight;
+      const targetVP = 0.85 * H_view;
+      sec.style.top  = (targetVP + eP * (H_cont - H_view)) + 'px';
 
       const kids = sec.querySelectorAll(
         '.sec-label,.sec-head,.sec-body,.sec-note,.stat,.cta-head,.cta-sub,.cta-btn,.cta-ghost'
@@ -223,25 +222,63 @@
           tl.from(kids, { y: 50, opacity: 0, stagger: 0.12, duration: 0.9, ease: 'power3.out' });
       }
 
-      let wasIn = false;
+      // Shared exit: all sections slide out to the right, matching "Your Body. Decoded."
+      const tlOut = gsap.timeline({ paused: true });
+      tlOut.to(kids, { x: 90, opacity: 0, stagger: 0.08, duration: 0.65, ease: 'power3.in' });
+
+      // Scroll-up thresholds: section appears near top (~20 % down) and
+      // disappears when it drifts past the middle (~55 % down).
+      const scrollDist = H_cont - H_view;
+      const eP_up = Math.min(eP + (0.65 * H_view / scrollDist), 0.995);
+      const lP_up = eP + (0.30 * H_view / scrollDist);
+
+      let wasIn    = false;
+      let prevP    = 0;
+      let trackedDir = 1; // 1 = down, -1 = up
+
       ScrollTrigger.create({
         trigger: scrollCont,
         start: 'top top', end: 'bottom bottom',
         scrub: false,
         onUpdate(self) {
-          const p   = self.progress;
-          const in_ = p >= eP && p <= lP;
+          const p     = self.progress;
+          const delta = p - prevP;
+
+          // Only update tracked direction when there is meaningful movement
+          // (dead-zone of 0.002 filters Lenis micro-oscillations at rest).
+          if (Math.abs(delta) > 0.002) {
+            trackedDir = delta > 0 ? 1 : -1;
+            prevP = p;
+          }
+
+          const in_ = trackedDir > 0
+            ? (p >= eP  && p <= lP)
+            : (p >= lP_up && p <= eP_up);
+
           if (in_ && !wasIn) {
             wasIn = true;
+            tlOut.pause();
+            // Only reset x — tlOut always ends at x:90 but scale-up /
+            // stagger-up entry animations never touch x, so without this
+            // reset kids would appear offset right on re-entry.
+            // Opacity is intentionally NOT reset here: calling gsap.set
+            // inside a rAF tick renders immediately this frame, then
+            // tl's from-state sets opacity back to 0 next frame — that
+            // one-frame difference is exactly what was causing the blink.
+            gsap.set(kids, { x: 0 });
             gsap.set(sec, { opacity: 1 });
             sec.classList.add('active');
             tl.timeScale(1).restart();
           } else if (!in_ && wasIn && !persist) {
             wasIn = false;
             sec.classList.remove('active');
-            tl.timeScale(1.6).reverse().then(() => {
-              gsap.set(sec, { opacity: 0 });
-              tl.timeScale(1);
+            tl.pause();
+            // No snap here — tlOut starts from kids' current state so the
+            // exit is smooth regardless of where the entry was interrupted.
+            // Snapping opacity to 1 first was the source of the blink.
+            tlOut.restart().then(() => {
+              // Guard against a re-entry that happened before tlOut finished.
+              if (!wasIn) gsap.set(sec, { opacity: 0 });
             });
           } else if (persist && p > lP) {
             gsap.set(sec, { opacity: 1 });

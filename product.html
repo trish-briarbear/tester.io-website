@@ -6,7 +6,7 @@
   <title>Tester Smart Watch Pro — Dissected</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: auto; }
@@ -55,33 +55,74 @@
     #ld-fill { height: 100%; width: 0%; background: linear-gradient(90deg,var(--gold),var(--gold-light)); transition: width 0.1s linear; }
     #ld-pct { font-family: var(--mono); font-size: 10px; color: rgba(240,237,232,0.35); letter-spacing: 0.12em; }
 
-    /* ── HEADER ── */
-    #site-header {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 500;
-      padding: 0 36px; height: 62px;
-      display: flex; align-items: center; justify-content: space-between;
-      border-bottom: 1px solid transparent;
-      transition: background 0.4s, border-color 0.4s;
+    /* ── NAV ── */
+    .nav-glass {
+      background: rgba(10,10,10,.82); backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid rgba(255,255,255,.06);
     }
-    #site-header.scrolled {
-      background: rgba(5,5,5,0.9); backdrop-filter: blur(20px);
-      border-color: rgba(255,255,255,0.06);
+    .nav-inner {
+      max-width: 1280px; margin: 0 auto; padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between; height: 64px;
     }
-    .hdr-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; }
-    .hdr-logo img { height: 24px; }
-    .hdr-logotxt { font-family: 'DM Sans',sans-serif; font-weight: 800; font-size: 14px; letter-spacing: -0.02em; color: #fff; }
-    .hdr-logotxt em { font-style: normal; background: linear-gradient(135deg,#c6a559,#e6b979); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-    .hdr-nav { display: flex; align-items: center; gap: 28px; }
-    .hdr-nav a { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.5); text-decoration: none; transition: color 0.2s; }
-    .hdr-nav a:hover { color: #fff; }
-    .hdr-cta {
-      display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: 8px;
-      background: linear-gradient(135deg,#c6a559,#e6b979); color: #050505;
-      font-weight: 700; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase;
-      text-decoration: none; box-shadow: 0 0 18px rgba(198,165,89,0.22);
-      transition: transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.2s;
+    .nav-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; flex-shrink: 0; }
+    .nav-logo img { height: 32px; width: auto; }
+    .nav-logo-txt { font-family: 'Montserrat',sans-serif; font-weight: 800; font-size: 18px; letter-spacing: -.03em; color: #fff; }
+    .nav-logo-txt span { background: linear-gradient(135deg,#c6a559,#e6b979); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .nav-links { display: flex; align-items: center; gap: 32px; }
+    .nav-link {
+      font-family: 'DM Sans',sans-serif; font-size: 14px; font-weight: 500;
+      color: rgba(255,255,255,.58); text-decoration: none;
+      transition: color .2s ease; padding: 4px 0; position: relative;
     }
-    .hdr-cta:hover { transform: translateY(-1px); box-shadow: 0 0 32px rgba(198,165,89,0.42); }
+    .nav-link::after {
+      content: ''; position: absolute; bottom: -3px; left: 0; right: 0;
+      height: 1px; background: var(--gold);
+      transform: scaleX(0); transition: transform .22s ease; transform-origin: left;
+    }
+    .nav-link:hover { color: #fff; }
+    .nav-link:hover::after { transform: scaleX(1); }
+    .nav-btns { display: flex; align-items: center; gap: 8px; }
+    .btn-nav {
+      display: inline-flex; align-items: center;
+      padding: 8px 18px; border-radius: 8px;
+      font-family: 'Montserrat',sans-serif; font-weight: 600; font-size: 13px;
+      cursor: pointer; transition: all .2s ease; white-space: nowrap; text-decoration: none;
+    }
+    .btn-nav-ghost { background: transparent; color: rgba(255,255,255,.75); border: 1px solid rgba(255,255,255,.1); }
+    .btn-nav-ghost:hover { background: rgba(255,255,255,.06); color: #fff; border-color: rgba(255,255,255,.22); }
+    .btn-nav-primary {
+      background: linear-gradient(135deg,#c6a559,#e6b979); color: #0a0a0a; border: none;
+      box-shadow: 0 0 16px rgba(198,165,89,.25), inset 0 1px 0 rgba(255,255,255,.16);
+      letter-spacing: .04em; text-transform: uppercase;
+    }
+    .btn-nav-primary:hover { box-shadow: 0 0 32px rgba(198,165,89,.5); transform: translateY(-1px); }
+    .hamburger {
+      display: none; flex-direction: column; justify-content: center; gap: 5.5px;
+      width: 36px; height: 36px; padding: 7px; cursor: pointer;
+      border: 1px solid rgba(255,255,255,.1); border-radius: 8px; background: transparent;
+      flex-shrink: 0; transition: border-color .2s ease;
+    }
+    .hamburger:hover { border-color: rgba(255,255,255,.25); }
+    .hamburger span { display: block; width: 18px; height: 1.5px; background: rgba(255,255,255,.72); border-radius: 2px; transition: transform .25s ease, opacity .2s ease; }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    #mobile-nav {
+      display: none; position: fixed; top: 64px; left: 0; right: 0; z-index: 49;
+      background: rgba(8,8,8,.97); backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px);
+      border-bottom: 1px solid rgba(255,255,255,.07);
+      padding: 8px 24px 24px; flex-direction: column;
+    }
+    #mobile-nav.open { display: flex; }
+    .mob-link {
+      font-family: 'DM Sans',sans-serif; font-size: 15px; font-weight: 500;
+      color: rgba(255,255,255,.6); text-decoration: none;
+      padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,.05); transition: color .2s;
+    }
+    .mob-link:hover { color: #fff; }
+    @media (max-width: 767px) { .hamburger { display: flex; } .nav-links { display: none; } .btn-nav-ghost { display: none; } }
+    @media (max-width: 479px) { .nav-inner { padding: 0 12px; } .btn-nav-primary { padding: 7px 11px; font-size: 11.5px; } }
 
     /* ── HERO ── */
     #hero {
@@ -250,13 +291,13 @@
 
     /* ── MOBILE ── */
     @media (max-width: 768px) {
-      .hdr-nav { display: none; }
       .align-left, .align-right { padding-left: 24px; padding-right: 24px; }
       .align-left .si, .align-right .si { max-width: 100%; }
       .stats-grid { grid-template-columns: repeat(2,1fr); gap: 28px; }
       #scroll-container { height: 380vh; }
       .ft-inner { flex-direction: column; align-items: flex-start; }
       .mq-item { font-size: 16vw; }
+      .nav-btns { margin-right: 60px; }
     }
   </style>
 </head>
@@ -272,20 +313,43 @@
   <span id="ld-pct">0%</span>
 </div>
 
-<!-- HEADER -->
-<header id="site-header">
-  <a href="index.html" class="hdr-logo">
-    <img src="brand_assets/tester-logo.png" alt="Tester.io">
-    <span class="hdr-logotxt">Tester<em>.io</em></span>
-  </a>
-  <nav class="hdr-nav">
-    <a href="index.html#features">Features</a>
-    <a href="index.html#product">Product</a>
-    <a href="index.html#pricing">Pricing</a>
-    <a href="index.html">Platform</a>
-  </nav>
-  <a href="index.html" class="hdr-cta">Get Started</a>
-</header>
+<!-- NAV -->
+<nav class="nav-glass" style="position:fixed;top:0;left:0;right:0;z-index:500;">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo" aria-label="Tester.io home">
+      <img src="brand_assets/tester-logo.png" alt="">
+      <span class="nav-logo-txt">Tester<span>.io</span></span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html#features" class="nav-link">Features</a>
+      <a href="index.html#product" class="nav-link">Product</a>
+      <a href="index.html#pricing" class="nav-link">Pricing</a>
+      <a href="index.html" class="nav-link">Platform</a>
+      <a href="product.html" class="nav-link" style="color:var(--gold);border-bottom:1px solid rgba(198,165,89,0.3);padding-bottom:2px;">Smart Watch Pro ↗</a>
+      <a href="anything.html" class="nav-link" style="color:var(--gold-light);">Signal Studio ✦</a>
+    </div>
+    <div class="nav-btns">
+      <a href="index.html" class="btn-nav btn-nav-ghost" style="display:none;" id="nav-login">Log In</a>
+      <a href="index.html" class="btn-nav btn-nav-primary">Get Started</a>
+      <button class="hamburger" id="hamburger-btn" aria-label="Toggle menu" aria-expanded="false" onclick="toggleMobileNav(this)">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div id="mobile-nav" role="navigation" aria-label="Mobile navigation">
+  <a href="index.html#features" class="mob-link">Features</a>
+  <a href="index.html#product" class="mob-link">Product</a>
+  <a href="index.html#pricing" class="mob-link">Pricing</a>
+  <a href="index.html" class="mob-link">Platform</a>
+  <a href="product.html" class="mob-link" style="color:var(--gold);">Smart Watch Pro ↗</a>
+  <a href="anything.html" class="mob-link" style="border-bottom:none;color:var(--gold-light);">Signal Studio ✦</a>
+  <div style="padding-top:16px;display:flex;flex-direction:column;gap:8px;">
+    <a href="index.html" class="btn-nav btn-nav-ghost" style="width:100%;justify-content:center;">Log In</a>
+    <a href="index.html" class="btn-nav btn-nav-primary" style="width:100%;justify-content:center;">Get Started</a>
+  </div>
+</div>
 
 <!-- ═══════════════════ HERO ═══════════════════ -->
 <section id="hero">
@@ -351,7 +415,7 @@
     </section>
 
     <!-- 003 / Intelligence — scale-up -->
-    <section class="ss align-left" data-enter="30" data-leave="44" data-anim="scale-up">
+    <section class="ss align-left" data-enter="30" data-leave="50" data-anim="scale-up">
       <div class="si">
         <span class="sec-label">003 / Intelligence</span>
         <h2 class="sec-head">AI That<br>Thinks<br>Ahead.</h2>
@@ -361,7 +425,7 @@
     </section>
 
     <!-- STATS — stagger-up, dark overlay -->
-    <section class="ss sec-stats" data-enter="44" data-leave="58" data-anim="stagger-up">
+    <section class="ss sec-stats" data-enter="54" data-leave="68" data-anim="stagger-up">
       <div class="stats-grid">
         <div class="stat">
           <span class="stat-num" data-val="180" data-dec="0">0</span><span class="stat-sfx">h</span>
@@ -383,7 +447,7 @@
     </section>
 
     <!-- 004 / Inside Out — slide-right -->
-    <section class="ss align-right" data-enter="58" data-leave="72" data-anim="slide-right">
+    <section class="ss align-right" data-enter="72" data-leave="82" data-anim="slide-right">
       <div class="si">
         <span class="sec-label">004 / Inside Out</span>
         <h2 class="sec-head">Every<br>Layer.</h2>
@@ -392,7 +456,7 @@
     </section>
 
     <!-- CTA — clip-reveal, persist -->
-    <section class="ss sec-cta" data-enter="72" data-leave="96" data-anim="clip-reveal" data-persist="true">
+    <section class="ss sec-cta" data-enter="90" data-leave="99" data-anim="clip-reveal" data-persist="true">
       <div class="cta-inner">
         <span class="sec-label">Order / Now</span>
         <h2 class="cta-head">Ready to<br><span class="g">Go Deeper?</span></h2>
@@ -401,7 +465,7 @@
           Get Started Free
           <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M3 7.5h9M9 4l3.5 3.5L9 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
-        <a href="index.html#products" class="cta-ghost">Browse all videos →</a>
+        <a href="anything.html" class="cta-ghost">Try Signal Studio — AI Video Generator →</a>
       </div>
     </section>
 
@@ -429,5 +493,13 @@
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
 <script src="product/app.js"></script>
+<script>
+  function toggleMobileNav(btn) {
+    const nav = document.getElementById('mobile-nav');
+    const open = nav.classList.toggle('open');
+    btn.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', open);
+  }
+</script>
 </body>
 </html>
